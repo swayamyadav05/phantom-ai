@@ -8,11 +8,12 @@ Update this file whenever the current phase, active feature, or meaningful imple
 
 ## Current Goal
 
-- Ready for next feature.
+- Feature 02 complete. Ready for next feature.
 
 ## Completed
 
 - **Feature 01: Design System** — shadcn/ui (base-nova preset) initialized with Tailwind v4; Button, Card, Dialog, Input, Tabs, Textarea, ScrollArea components added to `src/components/ui/`; `src/lib/utils.ts` with `cn()` created; lucide-react installed; globals.css rewritten with project dark theme CSS variables mapped via `@theme inline`; layout.tsx updated to Inter + JetBrains Mono fonts.
+- **Feature 02: Editor Chrome** — `src/components/editor/editor-navbar.tsx` (fixed navbar, sidebar toggle with `PanelLeftOpen`/`PanelLeftClose`, left/center/right sections, dark bg + bottom border); `src/components/editor/project-sidebar.tsx` (fixed overlay, slides in from left, My Projects/Shared tabs with empty states, New Project button); shadcn Dialog already available for future dialog patterns.
 
 ## In Progress
 
