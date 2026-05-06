@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import type { Project } from "@/types/project";
 
@@ -28,16 +28,20 @@ function shortSuffix(): string {
 export function useProjectActions() {
   const router = useRouter();
   const params = useParams();
-  const [dialog, setDialog] = useState<DialogState>({ type: null, project: null });
+  const [dialog, setDialog] = useState<DialogState>({
+    type: null,
+    project: null,
+  });
   const [name, setNameState] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const suffixRef = useRef<string>("");
+  const [suffix, setSuffix] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   const slug = toSlug(name);
-  const roomIdPreview = slug ? `${slug}-${suffixRef.current}` : "";
+  const roomIdPreview = slug ? `${slug}-${suffix}` : "";
 
   const openCreate = useCallback(() => {
-    suffixRef.current = shortSuffix();
+    setSuffix(shortSuffix());
     setNameState("");
     setDialog({ type: "create", project: null });
   }, []);
@@ -72,35 +76,47 @@ export function useProjectActions() {
           body: JSON.stringify({ name: name.trim() }),
         });
         if (!res.ok) throw new Error("Failed to create project");
-        const project = await res.json() as { id: string; slug: string | null };
+        const project = (await res.json()) as {
+          id: string;
+          slug: string | null;
+        };
         close();
         router.push(`/editor/${project.slug ?? project.id}`);
       } catch {
         setIsLoading(false);
+        setError("Something went wrong. Please try again.");
       }
     } else if (dialog.type === "rename" && dialog.project) {
       if (!name.trim()) return;
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/projects/${dialog.project.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: name.trim() }),
-        });
+        const res = await fetch(
+          `/api/projects/${dialog.project.id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: name.trim() }),
+          },
+        );
         if (!res.ok) throw new Error("Failed to rename project");
         close();
         router.refresh();
       } catch {
         setIsLoading(false);
+        setError("Something went wrong. Please try again.");
       }
     } else if (dialog.type === "delete" && dialog.project) {
       setIsLoading(true);
       const targetId = dialog.project.id;
       try {
-        const res = await fetch(`/api/projects/${targetId}`, { method: "DELETE" });
+        const res = await fetch(`/api/projects/${targetId}`, {
+          method: "DELETE",
+        });
         if (!res.ok) throw new Error("Failed to delete project");
         const rawSlug = params?.slug;
-        const activeSlug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug ?? null;
+        const activeSlug = Array.isArray(rawSlug)
+          ? rawSlug[0]
+          : (rawSlug ?? null);
         close();
         if (activeSlug && activeSlug === dialog.project.slug) {
           router.push("/editor");
@@ -109,6 +125,7 @@ export function useProjectActions() {
         }
       } catch {
         setIsLoading(false);
+        setError("Something went wrong. Please try again.");
       }
     }
   }, [dialog, name, close, router, params]);
@@ -119,6 +136,7 @@ export function useProjectActions() {
     slug,
     roomIdPreview,
     isLoading,
+    error,
     openCreate,
     openRename,
     openDelete,

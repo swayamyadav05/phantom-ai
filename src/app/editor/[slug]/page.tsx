@@ -6,7 +6,9 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export default async function ProjectWorkspacePage({ params }: Props) {
+export default async function ProjectWorkspacePage({
+  params,
+}: Props) {
   const { slug } = await params;
   const { userId } = await auth();
   if (!userId) notFound();
@@ -17,6 +19,7 @@ export default async function ProjectWorkspacePage({ params }: Props) {
   });
 
   if (!project) notFound();
+  if (project.ownerId !== userId) notFound();
 
   return (
     <div className="flex h-[calc(100vh-3rem)] items-center justify-center">
