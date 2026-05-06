@@ -53,3 +53,4 @@ Update this file whenever the current phase, active feature, or meaningful imple
 - `npx shadcn@latest init -d` works non-interactively (uses next template + base-nova preset).
 - `npx shadcn@latest add <components> --yes` adds components without prompts.
 - Do not modify generated `src/components/ui/*` files.
+- README initialized with project overview, current implementation status, setup steps, environment variable names, scripts, and repository structure.
