@@ -82,6 +82,7 @@ export function useProjectActions() {
         };
         close();
         router.push(`/editor/${project.slug ?? project.id}`);
+        router.refresh();
       } catch {
         setIsLoading(false);
         setError("Something went wrong. Please try again.");
@@ -113,12 +114,16 @@ export function useProjectActions() {
           method: "DELETE",
         });
         if (!res.ok) throw new Error("Failed to delete project");
-        const rawSlug = params?.slug;
-        const activeSlug = Array.isArray(rawSlug)
-          ? rawSlug[0]
-          : (rawSlug ?? null);
+        const rawRoomId = params?.roomId;
+        const activeRoomId = Array.isArray(rawRoomId)
+          ? rawRoomId[0]
+          : (rawRoomId ?? null);
         close();
-        if (activeSlug && activeSlug === dialog.project.slug) {
+        const matchesActive =
+          activeRoomId !== null &&
+          (activeRoomId === dialog.project.slug ||
+            activeRoomId === dialog.project.id);
+        if (matchesActive) {
           router.push("/editor");
         } else {
           router.refresh();
