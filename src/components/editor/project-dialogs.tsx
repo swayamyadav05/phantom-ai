@@ -83,7 +83,8 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && name.trim() && slug) handleSubmit();
+              if (e.key === "Enter" && name.trim() && slug)
+                handleSubmit();
             }}
             className="text-foreground"
             autoFocus
