@@ -1,12 +1,6 @@
-"use client";
-
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useProjectActions } from "@/context/project-actions";
+import { HomeNewProjectButton } from "@/components/editor/home-new-project-button";
 
 export default function EditorPage() {
-  const { openCreate } = useProjectActions();
-
   return (
     <div className="flex h-[calc(100vh-3rem)] items-center justify-center">
       <div className="flex flex-col items-center gap-4 text-center">
@@ -18,10 +12,7 @@ export default function EditorPage() {
             Start a new architecture workspace, or choose a project from the sidebar.
           </p>
         </div>
-        <Button onClick={openCreate} className="gap-2">
-          <Plus className="h-5 w-5" />
-          New Project
-        </Button>
+        <HomeNewProjectButton />
       </div>
     </div>
   );

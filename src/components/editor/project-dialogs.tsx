@@ -10,17 +10,18 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { useProjectDialogs } from "@/hooks/use-project-dialogs";
+import { Loader2 } from "lucide-react";
+import type { useProjectActions } from "@/hooks/use-project-actions";
 
 interface ProjectDialogsProps {
-  dialogs: ReturnType<typeof useProjectDialogs>;
+  dialogs: ReturnType<typeof useProjectActions>;
 }
 
 export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
   const {
     dialog,
     name,
-    slug,
+    roomIdPreview,
     isLoading,
     close,
     setName,
@@ -43,12 +44,15 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
               placeholder="Project name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && name.trim() && !isLoading) handleSubmit();
+              }}
               autoFocus
               className="text-foreground"
             />
             <div className="flex items-center gap-1.5 text-xs text-copy-faint">
-              <span>Slug:</span>
-              <span className="font-mono">{slug || "—"}</span>
+              <span>Room ID:</span>
+              <span className="font-mono">{roomIdPreview || "—"}</span>
             </div>
           </div>
           <DialogFooter>
@@ -57,8 +61,9 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!name.trim() || !slug || isLoading}>
-              Create
+              disabled={!name.trim() || isLoading}>
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading ? "Creating…" : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -83,13 +88,7 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
-              if (
-                e.key === "Enter" &&
-                name.trim() &&
-                slug &&
-                !isLoading
-              )
-                handleSubmit();
+              if (e.key === "Enter" && name.trim() && !isLoading) handleSubmit();
             }}
             className="text-foreground"
             autoFocus
@@ -100,8 +99,9 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!name.trim() || !slug || isLoading}>
-              Rename
+              disabled={!name.trim() || isLoading}>
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading ? "Renaming…" : "Rename"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -130,7 +130,8 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
               variant="destructive"
               onClick={handleSubmit}
               disabled={isLoading}>
-              Delete
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading ? "Deleting…" : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>

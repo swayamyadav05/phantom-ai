@@ -28,6 +28,7 @@ export type ProjectMinAggregateOutputType = {
   id: string | null
   ownerId: string | null
   name: string | null
+  slug: string | null
   description: string | null
   status: $Enums.ProjectStatus | null
   canvasJsonPath: string | null
@@ -39,6 +40,7 @@ export type ProjectMaxAggregateOutputType = {
   id: string | null
   ownerId: string | null
   name: string | null
+  slug: string | null
   description: string | null
   status: $Enums.ProjectStatus | null
   canvasJsonPath: string | null
@@ -50,6 +52,7 @@ export type ProjectCountAggregateOutputType = {
   id: number
   ownerId: number
   name: number
+  slug: number
   description: number
   status: number
   canvasJsonPath: number
@@ -63,6 +66,7 @@ export type ProjectMinAggregateInputType = {
   id?: true
   ownerId?: true
   name?: true
+  slug?: true
   description?: true
   status?: true
   canvasJsonPath?: true
@@ -74,6 +78,7 @@ export type ProjectMaxAggregateInputType = {
   id?: true
   ownerId?: true
   name?: true
+  slug?: true
   description?: true
   status?: true
   canvasJsonPath?: true
@@ -85,6 +90,7 @@ export type ProjectCountAggregateInputType = {
   id?: true
   ownerId?: true
   name?: true
+  slug?: true
   description?: true
   status?: true
   canvasJsonPath?: true
@@ -169,6 +175,7 @@ export type ProjectGroupByOutputType = {
   id: string
   ownerId: string
   name: string
+  slug: string | null
   description: string | null
   status: $Enums.ProjectStatus
   canvasJsonPath: string | null
@@ -201,6 +208,7 @@ export type ProjectWhereInput = {
   id?: Prisma.StringFilter<"Project"> | string
   ownerId?: Prisma.StringFilter<"Project"> | string
   name?: Prisma.StringFilter<"Project"> | string
+  slug?: Prisma.StringNullableFilter<"Project"> | string | null
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.StringNullableFilter<"Project"> | string | null
@@ -213,6 +221,7 @@ export type ProjectOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   canvasJsonPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -223,6 +232,7 @@ export type ProjectOrderByWithRelationInput = {
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   AND?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
   OR?: Prisma.ProjectWhereInput[]
   NOT?: Prisma.ProjectWhereInput | Prisma.ProjectWhereInput[]
@@ -234,12 +244,13 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   collaborators?: Prisma.ProjectCollaboratorListRelationFilter
-}, "id">
+}, "id" | "slug">
 
 export type ProjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   canvasJsonPath?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -257,6 +268,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Project"> | string
   ownerId?: Prisma.StringWithAggregatesFilter<"Project"> | string
   name?: Prisma.StringWithAggregatesFilter<"Project"> | string
+  slug?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   status?: Prisma.EnumProjectStatusWithAggregatesFilter<"Project"> | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
@@ -268,6 +280,7 @@ export type ProjectCreateInput = {
   id?: string
   ownerId: string
   name: string
+  slug?: string | null
   description?: string | null
   status?: $Enums.ProjectStatus
   canvasJsonPath?: string | null
@@ -280,6 +293,7 @@ export type ProjectUncheckedCreateInput = {
   id?: string
   ownerId: string
   name: string
+  slug?: string | null
   description?: string | null
   status?: $Enums.ProjectStatus
   canvasJsonPath?: string | null
@@ -292,6 +306,7 @@ export type ProjectUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -304,6 +319,7 @@ export type ProjectUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -316,6 +332,7 @@ export type ProjectCreateManyInput = {
   id?: string
   ownerId: string
   name: string
+  slug?: string | null
   description?: string | null
   status?: $Enums.ProjectStatus
   canvasJsonPath?: string | null
@@ -327,6 +344,7 @@ export type ProjectUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -338,6 +356,7 @@ export type ProjectUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -349,6 +368,7 @@ export type ProjectCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   canvasJsonPath?: Prisma.SortOrder
@@ -360,6 +380,7 @@ export type ProjectMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   canvasJsonPath?: Prisma.SortOrder
@@ -371,6 +392,7 @@ export type ProjectMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   canvasJsonPath?: Prisma.SortOrder
@@ -417,6 +439,7 @@ export type ProjectCreateWithoutCollaboratorsInput = {
   id?: string
   ownerId: string
   name: string
+  slug?: string | null
   description?: string | null
   status?: $Enums.ProjectStatus
   canvasJsonPath?: string | null
@@ -428,6 +451,7 @@ export type ProjectUncheckedCreateWithoutCollaboratorsInput = {
   id?: string
   ownerId: string
   name: string
+  slug?: string | null
   description?: string | null
   status?: $Enums.ProjectStatus
   canvasJsonPath?: string | null
@@ -455,6 +479,7 @@ export type ProjectUpdateWithoutCollaboratorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -466,6 +491,7 @@ export type ProjectUncheckedUpdateWithoutCollaboratorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
   canvasJsonPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -508,6 +534,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   description?: boolean
   status?: boolean
   canvasJsonPath?: boolean
@@ -521,6 +548,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   description?: boolean
   status?: boolean
   canvasJsonPath?: boolean
@@ -532,6 +560,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   description?: boolean
   status?: boolean
   canvasJsonPath?: boolean
@@ -543,6 +572,7 @@ export type ProjectSelectScalar = {
   id?: boolean
   ownerId?: boolean
   name?: boolean
+  slug?: boolean
   description?: boolean
   status?: boolean
   canvasJsonPath?: boolean
@@ -550,7 +580,7 @@ export type ProjectSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "description" | "status" | "canvasJsonPath" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "slug" | "description" | "status" | "canvasJsonPath" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   collaborators?: boolean | Prisma.Project$collaboratorsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
@@ -567,6 +597,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     ownerId: string
     name: string
+    slug: string | null
     description: string | null
     status: $Enums.ProjectStatus
     canvasJsonPath: string | null
@@ -999,6 +1030,7 @@ export interface ProjectFieldRefs {
   readonly id: Prisma.FieldRef<"Project", 'String'>
   readonly ownerId: Prisma.FieldRef<"Project", 'String'>
   readonly name: Prisma.FieldRef<"Project", 'String'>
+  readonly slug: Prisma.FieldRef<"Project", 'String'>
   readonly description: Prisma.FieldRef<"Project", 'String'>
   readonly status: Prisma.FieldRef<"Project", 'ProjectStatus'>
   readonly canvasJsonPath: Prisma.FieldRef<"Project", 'String'>

@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderOpen, Plus, Pencil, Trash2 } from "lucide-react";
+import { FolderOpen, Plus, Pencil, Trash2, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tabs,
@@ -8,7 +8,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/ui/tabs";
-import { MOCK_PROJECTS, type Project } from "@/types/project";
+import type { Project } from "@/types/project";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
@@ -16,6 +16,8 @@ interface ProjectSidebarProps {
   onCreateProject: () => void;
   onRenameProject: (project: Project) => void;
   onDeleteProject: (project: Project) => void;
+  ownedProjects: Project[];
+  sharedProjects: Project[];
 }
 
 function EmptyState({ label }: { label: string }) {
@@ -33,11 +35,7 @@ interface ProjectItemProps {
   onDelete: () => void;
 }
 
-function ProjectItem({
-  project,
-  onRename,
-  onDelete,
-}: ProjectItemProps) {
+function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
   return (
     <div
       className="group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-subtle"
@@ -80,10 +78,9 @@ export function ProjectSidebar({
   onCreateProject,
   onRenameProject,
   onDeleteProject,
+  ownedProjects,
+  sharedProjects,
 }: ProjectSidebarProps) {
-  const myProjects = MOCK_PROJECTS.filter((p) => p.isOwned);
-  const sharedProjects = MOCK_PROJECTS.filter((p) => !p.isOwned);
-
   return (
     <>
       {isOpen && (
@@ -100,6 +97,13 @@ export function ProjectSidebar({
           <span className="text-sm font-semibold text-copy-primary">
             Projects
           </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Close sidebar">
+            <PanelLeftClose className="h-5 w-5 text-copy-muted" />
+          </Button>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col p-3">
@@ -114,12 +118,10 @@ export function ProjectSidebar({
                 Shared
               </TabsTrigger>
             </TabsList>
-            <TabsContent
-              value="my-projects"
-              className="overflow-y-auto">
-              {myProjects.length > 0 ? (
+            <TabsContent value="my-projects" className="overflow-y-auto">
+              {ownedProjects.length > 0 ? (
                 <div className="flex flex-col gap-0.5 pt-1">
-                  {myProjects.map((project) => (
+                  {ownedProjects.map((project) => (
                     <ProjectItem
                       key={project.id}
                       project={project}
