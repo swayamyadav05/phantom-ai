@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Copy, Loader2, Trash2, UserPlus } from "lucide-react";
 import {
   Dialog,
@@ -54,50 +54,66 @@ export function ShareDialog({
   projectId,
   projectSlug,
 }: ShareDialogProps) {
-  const [collaborators, setCollaborators] = useState<CollaboratorData[]>([]);
+  const [collaborators, setCollaborators] = useState<
+    CollaboratorData[]
+  >([]);
   const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
-  const [removingEmail, setRemovingEmail] = useState<string | null>(null);
+  const [removingEmail, setRemovingEmail] = useState<string | null>(
+    null,
+  );
   const [copied, setCopied] = useState(false);
-  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const fetchCollaborators = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/projects/${projectId}/collaborators`);
-      if (!res.ok) return;
-      const data = (await res.json()) as {
-        collaborators: CollaboratorData[];
-        isOwner: boolean;
-      };
-      setCollaborators(data.collaborators);
-      setIsOwner(data.isOwner);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
-    if (open) {
-      void fetchCollaborators();
+    if (!open) return;
+
+    let cancelled = false;
+
+    void (async () => {
+      setLoading(true);
       setInviteEmail("");
       setInviteError(null);
-    }
-  }, [open, fetchCollaborators]);
+      try {
+        const res = await fetch(
+          `/api/projects/${projectId}/collaborators`,
+        );
+        if (cancelled || !res.ok) return;
+        const data = (await res.json()) as {
+          collaborators: CollaboratorData[];
+          isOwner: boolean;
+        };
+        if (cancelled) return;
+        setCollaborators(data.collaborators);
+        setIsOwner(data.isOwner);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, projectId]);
 
   async function handleInvite() {
     if (!inviteEmail.trim()) return;
     setInviting(true);
     setInviteError(null);
     try {
-      const res = await fetch(`/api/projects/${projectId}/collaborators`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: inviteEmail.trim() }),
-      });
+      const res = await fetch(
+        `/api/projects/${projectId}/collaborators`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: inviteEmail.trim() }),
+        },
+      );
       if (!res.ok) {
         const err = (await res.json()) as { error?: string };
         setInviteError(err.error ?? "Failed to invite collaborator.");
@@ -119,7 +135,9 @@ export function ShareDialog({
         { method: "DELETE" },
       );
       if (res.ok) {
-        setCollaborators((prev) => prev.filter((c) => c.email !== email));
+        setCollaborators((prev) =>
+          prev.filter((c) => c.email !== email),
+        );
       }
     } finally {
       setRemovingEmail(null);
@@ -130,8 +148,12 @@ export function ShareDialog({
     const link = `${window.location.origin}/editor/${projectSlug ?? projectId}`;
     void navigator.clipboard.writeText(link).then(() => {
       setCopied(true);
-      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
-      copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      if (copyTimeoutRef.current)
+        clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(
+        () => setCopied(false),
+        2000,
+      );
     });
   }
 
@@ -153,8 +175,7 @@ export function ShareDialog({
             variant="outline"
             size="sm"
             className="shrink-0 gap-1.5"
-            onClick={handleCopyLink}
-          >
+            onClick={handleCopyLink}>
             {copied ? (
               <>
                 <Check className="h-3.5 w-3.5 text-state-success" />
@@ -182,7 +203,8 @@ export function ShareDialog({
                   setInviteError(null);
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !inviting) void handleInvite();
+                  if (e.key === "Enter" && !inviting)
+                    void handleInvite();
                 }}
                 className="flex-1 text-foreground"
                 disabled={inviting}
@@ -191,8 +213,7 @@ export function ShareDialog({
                 size="default"
                 onClick={() => void handleInvite()}
                 disabled={!inviteEmail.trim() || inviting}
-                className="shrink-0 gap-1.5"
-              >
+                className="shrink-0 gap-1.5">
                 {inviting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -202,7 +223,9 @@ export function ShareDialog({
               </Button>
             </div>
             {inviteError && (
-              <p className="text-xs text-state-error">{inviteError}</p>
+              <p className="text-xs text-state-error">
+                {inviteError}
+              </p>
             )}
           </div>
         )}
@@ -210,7 +233,9 @@ export function ShareDialog({
         {/* Collaborator list */}
         <div className="flex flex-col gap-1">
           <p className="text-xs font-medium text-copy-muted">
-            {collaborators.length === 0 ? "No collaborators yet" : "Collaborators"}
+            {collaborators.length === 0
+              ? "No collaborators yet"
+              : "Collaborators"}
           </p>
           {loading ? (
             <div className="flex justify-center py-4">
@@ -221,8 +246,7 @@ export function ShareDialog({
               {collaborators.map((c) => (
                 <li
                   key={c.email}
-                  className="flex items-center gap-2.5 rounded-md px-1.5 py-1"
-                >
+                  className="flex items-center gap-2.5 rounded-md px-1.5 py-1">
                   <CollaboratorAvatar
                     name={c.name}
                     email={c.email}
@@ -240,16 +264,15 @@ export function ShareDialog({
                   </div>
                   {isOwner && (
                     <Button
-                      variant="ghost"
+                      variant="destructive"
                       size="icon-xs"
                       onClick={() => void handleRemove(c.email)}
                       disabled={removingEmail === c.email}
-                      aria-label={`Remove ${c.email}`}
-                    >
+                      aria-label={`Remove ${c.email}`}>
                       {removingEmail === c.email ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-copy-faint" />
                       ) : (
-                        <Trash2 className="h-3.5 w-3.5 text-copy-faint" />
+                        <Trash2 className="h-3.5 w-3.5 text-state-error" />
                       )}
                     </Button>
                   )}
