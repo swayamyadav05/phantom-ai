@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FolderOpen, Plus, Pencil, Trash2, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,7 @@ interface ProjectSidebarProps {
   onDeleteProject: (project: Project) => void;
   ownedProjects: Project[];
   sharedProjects: Project[];
+  currentProjectId: string | null;
 }
 
 function EmptyState({ label }: { label: string }) {
@@ -31,17 +33,37 @@ function EmptyState({ label }: { label: string }) {
 
 interface ProjectItemProps {
   project: Project;
+  isActive: boolean;
+  onNavigate: () => void;
   onRename: () => void;
   onDelete: () => void;
 }
 
-function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
+function ProjectItem({
+  project,
+  isActive,
+  onNavigate,
+  onRename,
+  onDelete,
+}: ProjectItemProps) {
+  const href = `/editor/${project.slug ?? project.id}`;
   return (
-    <div
-      className="group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-subtle"
-      tabIndex={0}>
-      <FolderOpen className="h-4 w-4 shrink-0 text-copy-faint" />
-      <span className="flex-1 truncate text-sm text-copy-secondary">
+    <Link
+      href={href}
+      onClick={onNavigate}
+      aria-current={isActive ? "page" : undefined}
+      className={`group flex items-center gap-2 rounded-md px-2 py-1.5 ${
+        isActive ? "bg-accent-dim" : "hover:bg-subtle"
+      }`}>
+      <FolderOpen
+        className={`h-4 w-4 shrink-0 ${
+          isActive ? "text-brand" : "text-copy-faint"
+        }`}
+      />
+      <span
+        className={`flex-1 truncate text-sm ${
+          isActive ? "text-copy-primary" : "text-copy-secondary"
+        }`}>
         {project.name}
       </span>
       {project.isOwned && (
@@ -50,6 +72,7 @@ function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
             variant="ghost"
             size="icon-xs"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               onRename();
             }}
@@ -60,6 +83,7 @@ function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
             variant="ghost"
             size="icon-xs"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               onDelete();
             }}
@@ -68,7 +92,7 @@ function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
           </Button>
         </div>
       )}
-    </div>
+    </Link>
   );
 }
 
@@ -80,6 +104,7 @@ export function ProjectSidebar({
   onDeleteProject,
   ownedProjects,
   sharedProjects,
+  currentProjectId,
 }: ProjectSidebarProps) {
   return (
     <>
@@ -125,6 +150,8 @@ export function ProjectSidebar({
                     <ProjectItem
                       key={project.id}
                       project={project}
+                      isActive={project.id === currentProjectId}
+                      onNavigate={onClose}
                       onRename={() => onRenameProject(project)}
                       onDelete={() => onDeleteProject(project)}
                     />
@@ -141,6 +168,8 @@ export function ProjectSidebar({
                     <ProjectItem
                       key={project.id}
                       project={project}
+                      isActive={project.id === currentProjectId}
+                      onNavigate={onClose}
                       onRename={() => onRenameProject(project)}
                       onDelete={() => onDeleteProject(project)}
                     />
