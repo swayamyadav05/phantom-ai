@@ -83,7 +83,12 @@ export function ProjectDialogs({ dialogs }: ProjectDialogsProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && name.trim() && slug)
+              if (
+                e.key === "Enter" &&
+                name.trim() &&
+                slug &&
+                !isLoading
+              )
                 handleSubmit();
             }}
             className="text-foreground"
