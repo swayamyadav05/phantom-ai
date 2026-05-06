@@ -8,7 +8,7 @@ Update this file whenever the current phase, active feature, or meaningful imple
 
 ## Current Goal
 
-- Feature 02 complete. Ready for next feature.
+- Feature 05 complete. Ready for next feature.
 
 ## Completed
 
@@ -16,6 +16,7 @@ Update this file whenever the current phase, active feature, or meaningful imple
 - **Feature 02: Editor Chrome** — `src/components/editor/editor-navbar.tsx` (fixed navbar, sidebar toggle with `PanelLeftOpen`/`PanelLeftClose`, left/center/right sections, dark bg + bottom border); `src/components/editor/project-sidebar.tsx` (fixed overlay, slides in from left, My Projects/Shared tabs with empty states, New Project button); shadcn Dialog already available for future dialog patterns.
 - **Feature 03: Authentication** — `@clerk/ui` installed; `src/proxy.ts` (protected-first `clerkMiddleware`, public routes from `NEXT_PUBLIC_CLERK_SIGN_IN_URL`/`NEXT_PUBLIC_CLERK_SIGN_UP_URL` env vars); `ClerkProvider` with `dark` theme and CSS variable overrides wraps root layout; `/` redirects authenticated → `/editor`, unauthenticated → `/sign-in`; `src/app/sign-in/[[...sign-in]]/page.tsx` and `src/app/sign-up/[[...sign-up]]/page.tsx` with two-panel desktop layout (left: logo + tagline + feature list, right: Clerk form), form-only on mobile; `UserButton` in editor navbar right section.
 - **Feature 04: Project Dialogs** — `src/types/project.ts` (Project interface + MOCK_PROJECTS); `src/hooks/use-project-dialogs.ts` (dialog/form/loading state, slug derivation); `src/context/project-actions.tsx` (ProjectActionsContext + useProjectActions hook); `src/components/editor/project-dialogs.tsx` (Create/Rename/Delete dialogs); editor home screen in `src/app/editor/page.tsx` (heading + description + New Project button); sidebar updated with project list, per-item rename/delete actions (owned only), mobile backdrop scrim; EditorShell wires context + dialogs.
+- **Feature 05: Prisma Data Models** — `prisma/models/project.prisma` (Project model with ownerId/name/description/status enum DRAFT|ARCHIVED/canvasJsonPath/timestamps + indexes on ownerId and createdAt; ProjectCollaborator model with cascade-delete relation, unique on projectId+email, indexes on email and projectId+createdAt); `prisma/schema.prisma` updated (fixed output path typo, removed url field — datasource URL now owned by `prisma.config.ts`); `src/lib/prisma.ts` cached singleton branching on DATABASE_URL prefix (prisma+postgres:// → accelerateUrl, otherwise PrismaPg adapter); migration `20260506100955_init_project_models` applied; Prisma client generated to `src/app/generated/prisma`.
 
 ## In Progress
 
@@ -23,7 +24,7 @@ Update this file whenever the current phase, active feature, or meaningful imple
 
 ## Next Up
 
-- [Add the next planned feature unit here]
+- [Add the next planned feature unit here, eg. Next Feature X (TBD) ]
 
 ## Open Questions
 
@@ -31,12 +32,16 @@ Update this file whenever the current phase, active feature, or meaningful imple
 
 ## Architecture Decisions
 
+[update as we go]
+
 - shadcn/ui v4.7.0 uses "base-nova" preset (the replacement for "new-york" style in the new CLI). Components are generated from @base-ui/react primitives.
 - Tailwind v4 CSS-first config — no tailwind.config.js. All tokens defined in globals.css via `@theme inline`.
 - Dark-only theme: all shadcn `--background`, `--foreground`, etc. are set in `:root` to dark values; no `.dark` class toggling needed.
 - `dark:` variant classes on generated shadcn components are inert (class never applied) but harmless since `:root` already provides dark values.
 
 ## Session Notes
+
+[update as we go]
 
 - Project uses Next.js 16.2.4 with Tailwind v4 (`@import "tailwindcss"` syntax, no tailwind.config.js).
 - shadcn CLI v4.7.0 — `--style` flag removed; use `--preset` or `-d` for defaults.
