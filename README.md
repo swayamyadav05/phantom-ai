@@ -38,6 +38,7 @@ Phantom AI is a real-time collaborative system design workspace. It is built aro
 - npm
 - PostgreSQL database
 - Clerk application keys
+- Liveblocks secret key
 
 ### Install
 
@@ -59,6 +60,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL="/editor"
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL="/editor"
 NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL="/editor"
 NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL="/editor"
+LIVEBLOCKS_SECRET_KEY="sk_..."
 ```
 
 ### Prepare the Database

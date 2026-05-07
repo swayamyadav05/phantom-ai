@@ -23,5 +23,5 @@ export default async function ProjectWorkspacePage({ params }: Props) {
   const allowed = await userCanAccessProject(identity, project);
   if (!allowed) return <AccessDenied />;
 
-  return <WorkspaceCanvas />;
+  return <WorkspaceCanvas roomId={project.id} />;
 }

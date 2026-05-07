@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 export interface ClerkIdentity {
   userId: string;
   primaryEmail: string | null;
+  displayName: string;
+  avatarUrl: string;
 }
 
 export async function getClerkIdentity(): Promise<ClerkIdentity | null> {
@@ -15,6 +17,9 @@ export async function getClerkIdentity(): Promise<ClerkIdentity | null> {
   return {
     userId: user.id,
     primaryEmail: primary?.emailAddress ?? null,
+    displayName:
+      user.fullName ?? user.username ?? primary?.emailAddress ?? "Anonymous User",
+    avatarUrl: user.imageUrl ?? "",
   };
 }
 
