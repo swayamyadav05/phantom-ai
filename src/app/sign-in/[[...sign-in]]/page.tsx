@@ -8,7 +8,12 @@ export default function SignInPage() {
       {/* Left panel — 50% on lg+, hidden on mobile */}
       <div className="hidden lg:flex lg:w-1/2 flex-col bg-elevated px-16 py-14">
         {/* Logo */}
-        <Image src="/name-logo.svg" alt="Phantom AI" width={160} height={40} />
+        <Image
+          src="/name-logo.svg"
+          alt="Phantom AI"
+          width={160}
+          height={160}
+        />
 
         {/* Hero + features */}
         <div className="flex-1 flex flex-col justify-center">
@@ -18,8 +23,9 @@ export default function SignInPage() {
             speed of thought.
           </h1>
           <p className="text-copy-secondary leading-relaxed mb-12">
-            Describe your architecture in plain English. Phantom AI maps it to a
-            shared canvas your whole team can refine in real time.
+            Describe your architecture in plain English. Phantom AI
+            maps it to a shared canvas your whole team can refine in
+            real time.
           </p>
 
           <ul className="space-y-8">
@@ -32,8 +38,8 @@ export default function SignInPage() {
                   AI Architecture Generation
                 </p>
                 <p className="text-copy-muted text-sm leading-relaxed">
-                  Describe your system, AI maps it to nodes and edges on a live
-                  canvas.
+                  Describe your system, AI maps it to nodes and edges
+                  on a live canvas.
                 </p>
               </div>
             </li>
@@ -46,8 +52,8 @@ export default function SignInPage() {
                   Real-time Collaboration
                 </p>
                 <p className="text-copy-muted text-sm leading-relaxed">
-                  Live cursors, presence indicators, and shared node editing
-                  across your team.
+                  Live cursors, presence indicators, and shared node
+                  editing across your team.
                 </p>
               </div>
             </li>
@@ -60,8 +66,8 @@ export default function SignInPage() {
                   Instant Spec Generation
                 </p>
                 <p className="text-copy-muted text-sm leading-relaxed">
-                  Export a complete Markdown technical spec directly from the
-                  canvas graph.
+                  Export a complete Markdown technical spec directly
+                  from the canvas graph.
                 </p>
               </div>
             </li>

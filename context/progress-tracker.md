@@ -48,6 +48,7 @@ Update this file whenever the current phase, active feature, or meaningful imple
 
 [update as we go]
 
+- Fixed Prisma Postgres runtime configuration to use the pooled `DATABASE_URL`, added `DIRECT_URL` for Prisma CLI commands, and added migration `20260507000000_add_project_slug` for the project slug column used by editor room URLs. Applying/verifying the migration is blocked because both Prisma Postgres TCP endpoints currently reset connections with `ECONNRESET` / Prisma `P1017`.
 - Project uses Next.js 16.2.4 with Tailwind v4 (`@import "tailwindcss"` syntax, no tailwind.config.js).
 - shadcn CLI v4.7.0 — `--style` flag removed; use `--preset` or `-d` for defaults.
 - `npx shadcn@latest init -d` works non-interactively (uses next template + base-nova preset).
