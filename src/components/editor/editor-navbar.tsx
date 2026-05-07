@@ -34,8 +34,9 @@ export function EditorNavbar({
           variant="ghost"
           size="icon"
           onClick={onSidebarToggle}
-          aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
-        >
+          aria-label={
+            isSidebarOpen ? "Close sidebar" : "Open sidebar"
+          }>
           {isSidebarOpen ? (
             <PanelLeftClose className="h-5 w-5 text-copy-muted" />
           ) : (
@@ -72,8 +73,7 @@ export function EditorNavbar({
               size="sm"
               className="gap-1.5"
               onClick={workspace.onShare}
-              aria-label="Share project"
-            >
+              aria-label="Share project">
               <Share2 className="h-4 w-4 text-copy-muted" />
               <span className="text-copy-secondary">Share</span>
             </Button>
@@ -86,8 +86,7 @@ export function EditorNavbar({
                 workspace.isAiSidebarOpen
                   ? "Close AI sidebar"
                   : "Open AI sidebar"
-              }
-            >
+              }>
               <Sparkles
                 className={`h-5 w-5 ${
                   workspace.isAiSidebarOpen

@@ -6,7 +6,11 @@ function createClient() {
   if (url.startsWith("prisma+postgres://")) {
     return new PrismaClient({ accelerateUrl: url });
   }
-  return new PrismaClient({ adapter: new PrismaPg(url) });
+  return new PrismaClient({
+    adapter: new PrismaPg({
+      connectionString: url,
+    }),
+  });
 }
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
