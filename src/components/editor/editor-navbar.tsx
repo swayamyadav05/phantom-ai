@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import {
+  LayoutTemplate,
   PanelLeftOpen,
   PanelLeftClose,
   Share2,
@@ -18,6 +19,7 @@ interface EditorNavbarProps {
     isAiSidebarOpen: boolean;
     onAiSidebarToggle: () => void;
     onShare: () => void;
+    onOpenStarterTemplates: () => void;
   };
 }
 
@@ -68,6 +70,15 @@ export function EditorNavbar({
       <div className="ml-auto flex items-center gap-1 px-3">
         {workspace && (
           <>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5"
+              onClick={workspace.onOpenStarterTemplates}
+              aria-label="Open starter templates">
+              <LayoutTemplate className="h-4 w-4 text-copy-muted" />
+              <span className="text-copy-secondary">Templates</span>
+            </Button>
             <Button
               variant="ghost"
               size="sm"

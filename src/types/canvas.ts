@@ -34,7 +34,16 @@ export interface CanvasNodeData extends Record<string, unknown> {
   shape: CanvasNodeShape;
 }
 
-export type CanvasEdgeData = Record<string, never>;
+export type CanvasEdgeDirection =
+  | "forward"
+  | "backward"
+  | "both"
+  | "none";
+
+export interface CanvasEdgeData extends Record<string, unknown> {
+  label?: string;
+  direction?: CanvasEdgeDirection;
+}
 
 export type CanvasNode = Node<CanvasNodeData, CanvasNodeType>;
 export type CanvasEdge = Edge<CanvasEdgeData, CanvasEdgeType>;
