@@ -97,6 +97,9 @@ export async function GET(
   }
 
   const res = await fetch(record.canvasJsonPath, {
+    headers: {
+      Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+    },
     cache: "no-store",
   });
   if (!res.ok) {
