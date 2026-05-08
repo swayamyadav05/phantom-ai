@@ -42,19 +42,26 @@ export async function PUT(
     );
   }
 
-  const blob = await put(`canvas/${project.id}.json`, raw, {
-    access: "private",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json",
-  });
+  try {
+    const blob = await put(`canvas/${project.id}.json`, raw, {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      contentType: "application/json",
+    });
 
-  await prisma.project.update({
-    where: { id: project.id },
-    data: { canvasJsonPath: blob.url },
-  });
+    await prisma.project.update({
+      where: { id: project.id },
+      data: { canvasJsonPath: blob.url },
+    });
 
-  return NextResponse.json({ url: blob.url });
+    return NextResponse.json({ url: blob.url });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to save canvas" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function GET(
