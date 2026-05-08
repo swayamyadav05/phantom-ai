@@ -12,10 +12,19 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { useLiveblocksFlow } from "@liveblocks/react-flow";
-import { useUndo, useRedo, useCanUndo, useCanRedo } from "@liveblocks/react";
+import {
+  useUndo,
+  useRedo,
+  useCanUndo,
+  useCanRedo,
+} from "@liveblocks/react";
 import "@xyflow/react/dist/style.css";
 import "@liveblocks/react-flow/styles.css";
-import { CANVAS_NODE_TYPE, CANVAS_EDGE_TYPE, NODE_COLORS } from "@/types/canvas";
+import {
+  CANVAS_NODE_TYPE,
+  CANVAS_EDGE_TYPE,
+  NODE_COLORS,
+} from "@/types/canvas";
 import type {
   CanvasEdge,
   CanvasEdgeDirection,
@@ -78,27 +87,45 @@ function BaseCanvasContent() {
     (nodeId: string, label: string) => {
       const node = nodes.find((n) => n.id === nodeId);
       if (!node) return;
-      onNodesChange([{ type: "replace", id: nodeId, item: { ...node, data: { ...node.data, label } } }]);
+      onNodesChange([
+        {
+          type: "replace",
+          id: nodeId,
+          item: { ...node, data: { ...node.data, label } },
+        },
+      ]);
     },
-    [nodes, onNodesChange]
+    [nodes, onNodesChange],
   );
 
   const updateNodeColor = useCallback(
     (nodeId: string, fill: (typeof NODE_COLORS)[number]["fill"]) => {
       const node = nodes.find((n) => n.id === nodeId);
       if (!node) return;
-      onNodesChange([{ type: "replace", id: nodeId, item: { ...node, data: { ...node.data, color: fill } } }]);
+      onNodesChange([
+        {
+          type: "replace",
+          id: nodeId,
+          item: { ...node, data: { ...node.data, color: fill } },
+        },
+      ]);
     },
-    [nodes, onNodesChange]
+    [nodes, onNodesChange],
   );
 
   const updateEdgeLabel = useCallback(
     (edgeId: string, label: string) => {
       const edge = edges.find((e) => e.id === edgeId);
       if (!edge) return;
-      onEdgesChange([{ type: "replace", id: edgeId, item: { ...edge, data: { ...edge.data, label } } }]);
+      onEdgesChange([
+        {
+          type: "replace",
+          id: edgeId,
+          item: { ...edge, data: { ...edge.data, label } },
+        },
+      ]);
     },
-    [edges, onEdgesChange]
+    [edges, onEdgesChange],
   );
 
   const updateEdgeDirection = useCallback(
@@ -120,14 +147,20 @@ function BaseCanvasContent() {
     (template: CanvasTemplate) => {
       const edgeChanges = [
         ...edges.map((e) => ({ type: "remove" as const, id: e.id })),
-        ...template.edges.map((e) => ({ type: "add" as const, item: e })),
+        ...template.edges.map((e) => ({
+          type: "add" as const,
+          item: e,
+        })),
       ];
       const nodeChanges = [
         ...nodes.map((n) => ({ type: "remove" as const, id: n.id })),
-        ...template.nodes.map((n) => ({ type: "add" as const, item: n })),
+        ...template.nodes.map((n) => ({
+          type: "add" as const,
+          item: n,
+        })),
       ];
-      if (edgeChanges.length > 0) onEdgesChange(edgeChanges);
       if (nodeChanges.length > 0) onNodesChange(nodeChanges);
+      if (edgeChanges.length > 0) onEdgesChange(edgeChanges);
 
       requestAnimationFrame(() => {
         flow.fitView({ duration: 400, padding: 0.2 });
@@ -141,13 +174,21 @@ function BaseCanvasContent() {
       e.preventDefault();
       const raw = e.dataTransfer.getData(CANVAS_SHAPE_DRAG_TYPE);
       if (!raw) return;
-      const { shape, width, height } = JSON.parse(raw) as ShapeDragPayload;
-      const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      const { shape, width, height } = JSON.parse(
+        raw,
+      ) as ShapeDragPayload;
+      const position = screenToFlowPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
       const id = `${shape}-${Date.now()}-${++nodeCounter}`;
       const newNode: CanvasNode = {
         id,
         type: CANVAS_NODE_TYPE,
-        position: { x: position.x - width / 2, y: position.y - height / 2 },
+        position: {
+          x: position.x - width / 2,
+          y: position.y - height / 2,
+        },
         data: {
           label: "",
           color: NODE_COLORS[0].fill,
@@ -158,7 +199,7 @@ function BaseCanvasContent() {
       };
       onNodesChange([{ type: "add", item: newNode }]);
     },
-    [screenToFlowPosition, onNodesChange]
+    [screenToFlowPosition, onNodesChange],
   );
 
   return (
@@ -168,10 +209,11 @@ function BaseCanvasContent() {
         updateNodeColor,
         updateEdgeLabel,
         updateEdgeDirection,
-      }}
-    >
+      }}>
       {/* Arrow markers referenced by canvas-edge.tsx */}
-      <svg style={{ width: 0, height: 0, position: "absolute" }} aria-hidden>
+      <svg
+        style={{ width: 0, height: 0, position: "absolute" }}
+        aria-hidden>
         <defs>
           <marker
             id="canvas-edge-arrow-rest"
@@ -180,8 +222,7 @@ function BaseCanvasContent() {
             markerHeight="12"
             orient="auto"
             refX="0"
-            refY="0"
-          >
+            refY="0">
             <polygon points="-7,-4 0,0 -7,4" fill="#475569" />
           </marker>
           <marker
@@ -191,8 +232,7 @@ function BaseCanvasContent() {
             markerHeight="12"
             orient="auto"
             refX="0"
-            refY="0"
-          >
+            refY="0">
             <polygon points="-7,-4 0,0 -7,4" fill="#94a3b8" />
           </marker>
           <marker
@@ -202,8 +242,7 @@ function BaseCanvasContent() {
             markerHeight="12"
             orient="auto-start-reverse"
             refX="0"
-            refY="0"
-          >
+            refY="0">
             <polygon points="-7,-4 0,0 -7,4" fill="#475569" />
           </marker>
           <marker
@@ -213,8 +252,7 @@ function BaseCanvasContent() {
             markerHeight="12"
             orient="auto-start-reverse"
             refX="0"
-            refY="0"
-          >
+            refY="0">
             <polygon points="-7,-4 0,0 -7,4" fill="#94a3b8" />
           </marker>
         </defs>
@@ -233,8 +271,7 @@ function BaseCanvasContent() {
         onDrop={onDrop}
         connectionMode={ConnectionMode.Loose}
         fitView
-        className="bg-base"
-      >
+        className="bg-base">
         <Background
           variant={BackgroundVariant.Dots}
           gap={18}

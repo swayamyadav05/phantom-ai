@@ -211,7 +211,12 @@ function SwatchButton({
   const [hovered, setHovered] = useState(false);
   return (
     <button
-      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      aria-label={`Set node color to ${fill}`}
+      aria-pressed={isActive}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       onMouseDown={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
       onMouseEnter={() => setHovered(true)}
@@ -221,7 +226,9 @@ function SwatchButton({
         height: 16,
         borderRadius: "50%",
         backgroundColor: fill,
-        border: isActive ? `2px solid ${textColor}` : "2px solid rgba(255,255,255,0.12)",
+        border: isActive
+          ? `2px solid ${textColor}`
+          : "2px solid rgba(255,255,255,0.12)",
         boxSizing: "border-box",
         cursor: "pointer",
         padding: 0,
@@ -241,7 +248,8 @@ function ColorToolbar({
   activeFill: string;
 }) {
   const { updateNodeColor } = useCanvasActions();
-  const stopPropagation = (e: React.SyntheticEvent) => e.stopPropagation();
+  const stopPropagation = (e: React.SyntheticEvent) =>
+    e.stopPropagation();
   return (
     <div
       style={{
@@ -262,8 +270,7 @@ function ColorToolbar({
       }}
       onMouseDown={stopPropagation}
       onPointerDown={stopPropagation}
-      onClick={stopPropagation}
-    >
+      onClick={stopPropagation}>
       {NODE_COLORS.map(({ fill, text }) => (
         <SwatchButton
           key={fill}
@@ -296,6 +303,7 @@ function LabelEditor({
 }) {
   const [value, setValue] = useState(initialValue);
   const ref = useRef<HTMLTextAreaElement>(null);
+  const doneRef = useRef(false);
 
   useEffect(() => {
     if (ref.current) {
@@ -323,15 +331,22 @@ function LabelEditor({
         value={value}
         placeholder="Label"
         onChange={(e) => setValue(e.target.value)}
-        onBlur={() => onCommit(value)}
+        onBlur={() => {
+          if (!doneRef.current) {
+            doneRef.current = true;
+            onCommit(value);
+          }
+        }}
         onKeyDown={(e) => {
           e.stopPropagation();
           if (e.key === "Escape") {
             e.preventDefault();
+            doneRef.current = true;
             onAbort();
           }
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
+            doneRef.current = true;
             onCommit(value);
           }
         }}

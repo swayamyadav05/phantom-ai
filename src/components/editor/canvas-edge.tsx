@@ -6,7 +6,12 @@ import {
   getSmoothStepPath,
   type EdgeProps,
 } from "@xyflow/react";
-import { ArrowLeft, ArrowLeftRight, ArrowRight, Minus } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  Minus,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { CanvasEdge, CanvasEdgeDirection } from "@/types/canvas";
 import { useCanvasActions } from "@/components/editor/canvas-actions-context";
@@ -50,8 +55,7 @@ function DirectionToolbar({
         border: "1px solid #253040",
         borderRadius: 9999,
         boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
-      }}
-    >
+      }}>
       {DIRECTION_OPTIONS.map(({ value, icon: Icon, label }) => {
         const isActive = value === active;
         return (
@@ -76,8 +80,7 @@ function DirectionToolbar({
               color: isActive ? "#f8fafc" : "#94a3b8",
               cursor: "pointer",
               transition: "background 0.12s ease, color 0.12s ease",
-            }}
-          >
+            }}>
             <Icon size={12} />
           </button>
         );
@@ -97,6 +100,13 @@ function LabelInput({
 }) {
   const [value, setValue] = useState(initialValue);
   const ref = useRef<HTMLInputElement>(null);
+  const committedRef = useRef(false);
+
+  const commitOnce = (v: string) => {
+    if (committedRef.current) return;
+    committedRef.current = true;
+    onCommit(v);
+  };
 
   useEffect(() => {
     ref.current?.focus();
@@ -111,11 +121,17 @@ function LabelInput({
       value={value}
       placeholder="Label"
       onChange={(e) => setValue(e.target.value)}
-      onBlur={() => onCommit(value)}
+      onBlur={() => commitOnce(value)}
       onKeyDown={(e) => {
         e.stopPropagation();
-        if (e.key === "Escape") { e.preventDefault(); onAbort(); }
-        if (e.key === "Enter") { e.preventDefault(); onCommit(value); }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          onAbort();
+        }
+        if (e.key === "Enter") {
+          e.preventDefault();
+          commitOnce(value);
+        }
       }}
       onMouseDown={stop}
       onPointerDown={stop}
@@ -172,8 +188,10 @@ export function CanvasEdgeRenderer({
   const startArrowId = isActive
     ? "canvas-edge-arrow-start-active"
     : "canvas-edge-arrow-start-rest";
-  const showEndArrow = direction === "forward" || direction === "both";
-  const showStartArrow = direction === "backward" || direction === "both";
+  const showEndArrow =
+    direction === "forward" || direction === "both";
+  const showStartArrow =
+    direction === "backward" || direction === "both";
 
   const commitLabel = (val: string) => {
     updateEdgeLabel(id, val);
@@ -193,7 +211,10 @@ export function CanvasEdgeRenderer({
         style={{ cursor: "pointer" }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onDoubleClick={(e) => { e.stopPropagation(); setEditing(true); }}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          setEditing(true);
+        }}
       />
       {/* Visible edge line */}
       <path
@@ -203,8 +224,13 @@ export function CanvasEdgeRenderer({
         strokeWidth={1.5}
         strokeLinecap="round"
         markerEnd={showEndArrow ? `url(#${endArrowId})` : undefined}
-        markerStart={showStartArrow ? `url(#${startArrowId})` : undefined}
-        style={{ transition: "stroke 0.12s ease", pointerEvents: "none" }}
+        markerStart={
+          showStartArrow ? `url(#${startArrowId})` : undefined
+        }
+        style={{
+          transition: "stroke 0.12s ease",
+          pointerEvents: "none",
+        }}
       />
       <EdgeLabelRenderer>
         {selected && !editing && (
@@ -215,8 +241,7 @@ export function CanvasEdgeRenderer({
               pointerEvents: "all",
               zIndex: 11,
             }}
-            className="nodrag nopan"
-          >
+            className="nodrag nopan">
             <DirectionToolbar edgeId={id} active={direction} />
           </div>
         )}
@@ -230,9 +255,11 @@ export function CanvasEdgeRenderer({
           className="nodrag nopan"
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
-          onDoubleClick={(e) => { e.stopPropagation(); setEditing(true); }}
-          onMouseDown={stopAll}
-        >
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+            setEditing(true);
+          }}
+          onMouseDown={stopAll}>
           {editing ? (
             <LabelInput
               initialValue={data?.label ?? ""}
@@ -251,8 +278,7 @@ export function CanvasEdgeRenderer({
                 fontFamily: "var(--font-inter, sans-serif)",
                 whiteSpace: "nowrap",
                 userSelect: "none",
-              }}
-            >
+              }}>
               {data.label}
             </span>
           ) : isActive ? (
@@ -263,8 +289,7 @@ export function CanvasEdgeRenderer({
                 fontFamily: "var(--font-inter, sans-serif)",
                 userSelect: "none",
                 pointerEvents: "none",
-              }}
-            >
+              }}>
               double-click to label
             </span>
           ) : null}
