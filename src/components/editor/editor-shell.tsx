@@ -7,6 +7,10 @@ import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
 import { AiSidebar } from "@/components/editor/ai-sidebar";
 import { ShareDialog } from "@/components/editor/share-dialog";
+import {
+  StarterTemplatesProvider,
+  useStarterTemplates,
+} from "@/components/editor/starter-templates-context";
 import { ProjectActionsContext } from "@/context/project-actions";
 import { useProjectActions } from "@/hooks/use-project-actions";
 import type { Project } from "@/types/project";
@@ -27,7 +31,15 @@ function findCurrentProject(
   );
 }
 
-export function EditorShell({
+export function EditorShell(props: EditorShellProps) {
+  return (
+    <StarterTemplatesProvider>
+      <EditorShellInner {...props} />
+    </StarterTemplatesProvider>
+  );
+}
+
+function EditorShellInner({
   children,
   ownedProjects,
   sharedProjects,
@@ -35,6 +47,7 @@ export function EditorShell({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const { setOpen: setStarterTemplatesOpen } = useStarterTemplates();
   const actions = useProjectActions();
   const params = useParams();
 
@@ -59,6 +72,7 @@ export function EditorShell({
         isAiSidebarOpen,
         onAiSidebarToggle: () => setIsAiSidebarOpen((prev) => !prev),
         onShare: () => setIsShareOpen(true),
+        onOpenStarterTemplates: () => setStarterTemplatesOpen(true),
       }
     : undefined;
 

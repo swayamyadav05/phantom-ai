@@ -136,3 +136,17 @@
     @apply font-sans;
   }
 }
+
+/* Canvas: connection handles — subtle white dots, fade in on node hover */
+.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #1C2532;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.react-flow__node:hover .react-flow__handle {
+  opacity: 1;
+}
