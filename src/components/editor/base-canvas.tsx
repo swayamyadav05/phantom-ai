@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Background,
   BackgroundVariant,
@@ -10,6 +10,7 @@ import {
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
+  useStore,
 } from "@xyflow/react";
 import { useLiveblocksFlow } from "@liveblocks/react-flow";
 import {
@@ -17,9 +18,12 @@ import {
   useRedo,
   useCanUndo,
   useCanRedo,
+  useMyPresence,
+  useOthers,
+  shallow,
 } from "@liveblocks/react";
 import "@xyflow/react/dist/style.css";
-import "@liveblocks/react-flow/styles.css";
+import "@liveblocks/react-ui/styles.css";
 import {
   CANVAS_NODE_TYPE,
   CANVAS_EDGE_TYPE,
@@ -44,6 +48,100 @@ import { StarterTemplatesModal } from "@/components/editor/starter-templates-mod
 import { useStarterTemplates } from "@/components/editor/starter-templates-context";
 import type { CanvasTemplate } from "@/components/editor/starter-templates";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useCanvasAutosave } from "@/hooks/use-canvas-autosave";
+import { PresenceAvatars } from "@/components/editor/presence-avatars";
+
+function CursorSvg({ color }: { color: string }) {
+  return (
+    <svg
+      width="18"
+      height="20"
+      viewBox="0 0 18 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: "block" }}
+      aria-hidden
+    >
+      <path
+        d="M2 1.5L15.5 9.5L9.5 11.5L6.5 18.5L2 1.5Z"
+        fill={color}
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CollaboratorCursors() {
+  const others = useOthers(
+    (all) =>
+      all
+        .filter((o) => o.presence.cursor !== null)
+        .map((o) => ({
+          connectionId: o.connectionId,
+          cursor: o.presence.cursor as { x: number; y: number },
+          name: o.info?.displayName ?? "Collaborator",
+          color: o.info?.cursorColor ?? "#6366f1",
+        })),
+    shallow,
+  );
+
+  const panX = useStore((s) => s.transform[0]);
+  const panY = useStore((s) => s.transform[1]);
+  const zoom = useStore((s) => s.transform[2]);
+
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 9999,
+        pointerEvents: "none",
+        overflow: "hidden",
+      }}
+    >
+      {others.map(({ connectionId, cursor, name, color }) => {
+        const x = cursor.x * zoom + panX;
+        const y = cursor.y * zoom + panY;
+        return (
+          <div
+            key={connectionId}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              transform: `translate3d(${x}px, ${y}px, 0)`,
+              transition: "transform 80ms linear",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          >
+            <CursorSvg color={color} />
+            <div
+              style={{
+                position: "absolute",
+                left: 16,
+                top: 14,
+                backgroundColor: color,
+                color: "#fff",
+                padding: "1px 6px",
+                borderRadius: 4,
+                fontSize: 11,
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+                lineHeight: "18px",
+              }}
+            >
+              {name}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 const nodeTypes = { [CANVAS_NODE_TYPE]: CanvasNodeRenderer };
 const edgeTypes = { [CANVAS_EDGE_TYPE]: CanvasEdgeRenderer };
@@ -54,7 +152,11 @@ const INITIAL_EDGES: CanvasEdge[] = [];
 
 let nodeCounter = 0;
 
-function BaseCanvasContent() {
+interface BaseCanvasProps {
+  projectId: string;
+}
+
+function BaseCanvasContent({ projectId }: BaseCanvasProps) {
   const flow = useReactFlow();
   const { screenToFlowPosition } = flow;
   const undo = useUndo();
@@ -64,7 +166,22 @@ function BaseCanvasContent() {
   const { isOpen: isTemplatesOpen, setOpen: setTemplatesOpen } =
     useStarterTemplates();
 
+  const [, updateMyPresence] = useMyPresence();
+
   useKeyboardShortcuts({ flow, undo, redo });
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      const pos = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      updateMyPresence({ cursor: pos });
+    },
+    [screenToFlowPosition, updateMyPresence],
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    updateMyPresence({ cursor: null });
+  }, [updateMyPresence]);
+
   const {
     nodes,
     edges,
@@ -76,6 +193,58 @@ function BaseCanvasContent() {
     suspense: true,
     nodes: { initial: INITIAL_NODES },
     edges: { initial: INITIAL_EDGES },
+  });
+
+  const [loadComplete, setLoadComplete] = useState(false);
+  const loadAttemptedRef = useRef(false);
+  const initialHasContentRef = useRef(nodes.length > 0 || edges.length > 0);
+
+  useEffect(() => {
+    if (loadAttemptedRef.current) return;
+    loadAttemptedRef.current = true;
+
+    let cancelled = false;
+    void (async () => {
+      if (initialHasContentRef.current) {
+        if (!cancelled) setLoadComplete(true);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/projects/${projectId}/canvas`);
+        if (cancelled || !res.ok) return;
+        const data = (await res.json()) as
+          | { nodes?: CanvasNode[]; edges?: CanvasEdge[] }
+          | null;
+        if (cancelled || !data) return;
+        const savedNodes = data.nodes ?? [];
+        const savedEdges = data.edges ?? [];
+        if (savedNodes.length > 0) {
+          onNodesChange(
+            savedNodes.map((n) => ({ type: "add" as const, item: n })),
+          );
+        }
+        if (savedEdges.length > 0) {
+          onEdgesChange(
+            savedEdges.map((e) => ({ type: "add" as const, item: e })),
+          );
+        }
+      } catch {
+        // Load failures fall through to an empty canvas — autosave will persist later edits.
+      } finally {
+        if (!cancelled) setLoadComplete(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, onNodesChange, onEdgesChange]);
+
+  useCanvasAutosave({
+    projectId,
+    nodes,
+    edges,
+    enabled: loadComplete,
   });
 
   const onDragOver = useCallback((e: React.DragEvent) => {
@@ -269,9 +438,15 @@ function BaseCanvasContent() {
         onDelete={onDelete}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         connectionMode={ConnectionMode.Loose}
         fitView
         className="bg-base">
+        <CollaboratorCursors />
+        <Panel position="top-right" className="mr-4 mt-4">
+          <PresenceAvatars />
+        </Panel>
         <Background
           variant={BackgroundVariant.Dots}
           gap={18}
@@ -312,10 +487,10 @@ function BaseCanvasContent() {
   );
 }
 
-export function BaseCanvas() {
+export function BaseCanvas({ projectId }: BaseCanvasProps) {
   return (
     <ReactFlowProvider>
-      <BaseCanvasContent />
+      <BaseCanvasContent projectId={projectId} />
     </ReactFlowProvider>
   );
 }
