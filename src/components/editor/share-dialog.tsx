@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Check, Copy, Loader2, Trash2, UserPlus } from "lucide-react";
 import {
   Dialog,
@@ -33,10 +34,11 @@ function CollaboratorAvatar({
   return (
     <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-subtle">
       {avatarUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <Image
           src={avatarUrl}
           alt={name ?? email}
+          width={28}
+          height={28}
           className="h-full w-full object-cover"
         />
       ) : (
@@ -159,7 +161,9 @@ export function ShareDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton className="sm:max-w-md">
+      <DialogContent
+        showCloseButton
+        className="sm:max-w-lg max-w-3xl">
         <DialogHeader>
           <DialogTitle>Share project</DialogTitle>
         </DialogHeader>

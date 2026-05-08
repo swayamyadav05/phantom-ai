@@ -2,14 +2,19 @@
 
 import Image from "next/image";
 import {
+  AlertCircle,
+  Check,
   LayoutTemplate,
+  Loader2,
   PanelLeftOpen,
   PanelLeftClose,
+  Save,
   Share2,
   Sparkles,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import type { CanvasSaveStatus } from "@/components/editor/canvas-save-context";
 
 interface EditorNavbarProps {
   isSidebarOpen: boolean;
@@ -20,7 +25,42 @@ interface EditorNavbarProps {
     onAiSidebarToggle: () => void;
     onShare: () => void;
     onOpenStarterTemplates: () => void;
+    saveStatus: CanvasSaveStatus;
+    onSave: () => void;
   };
+}
+
+function SaveStatusContent({ status }: { status: CanvasSaveStatus }) {
+  if (status === "saving") {
+    return (
+      <>
+        <Loader2 className="h-4 w-4 animate-spin text-copy-muted" />
+        <span className="text-copy-secondary">Saving</span>
+      </>
+    );
+  }
+  if (status === "saved") {
+    return (
+      <>
+        <Check className="h-4 w-4 text-state-success" />
+        <span className="text-copy-secondary">Saved</span>
+      </>
+    );
+  }
+  if (status === "error") {
+    return (
+      <>
+        <AlertCircle className="h-4 w-4 text-state-error" />
+        <span className="text-copy-secondary">Retry save</span>
+      </>
+    );
+  }
+  return (
+    <>
+      <Save className="h-4 w-4 text-copy-muted" />
+      <span className="text-copy-secondary">Save</span>
+    </>
+  );
 }
 
 export function EditorNavbar({
@@ -78,6 +118,15 @@ export function EditorNavbar({
               aria-label="Open starter templates">
               <LayoutTemplate className="h-4 w-4 text-copy-muted" />
               <span className="text-copy-secondary">Templates</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5"
+              onClick={workspace.onSave}
+              disabled={workspace.saveStatus === "saving"}
+              aria-label="Save canvas">
+              <SaveStatusContent status={workspace.saveStatus} />
             </Button>
             <Button
               variant="ghost"

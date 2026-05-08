@@ -11,6 +11,10 @@ import {
   StarterTemplatesProvider,
   useStarterTemplates,
 } from "@/components/editor/starter-templates-context";
+import {
+  CanvasSaveProvider,
+  useCanvasSave,
+} from "@/components/editor/canvas-save-context";
 import { ProjectActionsContext } from "@/context/project-actions";
 import { useProjectActions } from "@/hooks/use-project-actions";
 import type { Project } from "@/types/project";
@@ -34,7 +38,9 @@ function findCurrentProject(
 export function EditorShell(props: EditorShellProps) {
   return (
     <StarterTemplatesProvider>
-      <EditorShellInner {...props} />
+      <CanvasSaveProvider>
+        <EditorShellInner {...props} />
+      </CanvasSaveProvider>
     </StarterTemplatesProvider>
   );
 }
@@ -48,6 +54,7 @@ function EditorShellInner({
   const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const { setOpen: setStarterTemplatesOpen } = useStarterTemplates();
+  const { status: saveStatus, manualSave } = useCanvasSave();
   const actions = useProjectActions();
   const params = useParams();
 
@@ -73,6 +80,10 @@ function EditorShellInner({
         onAiSidebarToggle: () => setIsAiSidebarOpen((prev) => !prev),
         onShare: () => setIsShareOpen(true),
         onOpenStarterTemplates: () => setStarterTemplatesOpen(true),
+        saveStatus,
+        onSave: () => {
+          void manualSave();
+        },
       }
     : undefined;
 

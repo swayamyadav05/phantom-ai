@@ -71,12 +71,12 @@ export function WorkspaceCanvas({ roomId }: WorkspaceCanvasProps) {
         <LiveblocksConnectionBoundary key={roomId}>
           <RoomProvider
             id={roomId}
-            initialPresence={{ cursor: null, isThinking: false }}
+            initialPresence={{ cursor: null, thinking: false }}
           >
             <ClientSideSuspense
               fallback={<CanvasLoading />}
             >
-              <BaseCanvas />
+              <BaseCanvas projectId={roomId} />
             </ClientSideSuspense>
           </RoomProvider>
         </LiveblocksConnectionBoundary>
