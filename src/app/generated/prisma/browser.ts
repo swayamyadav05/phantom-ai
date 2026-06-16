@@ -18,6 +18,11 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
+ * Model ProjectSpec
+ * 
+ */
+export type ProjectSpec = Prisma.ProjectSpecModel
+/**
  * Model Project
  * 
  */
@@ -27,3 +32,8 @@ export type Project = Prisma.ProjectModel
  * 
  */
 export type ProjectCollaborator = Prisma.ProjectCollaboratorModel
+/**
+ * Model TaskRun
+ * 
+ */
+export type TaskRun = Prisma.TaskRunModel

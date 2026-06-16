@@ -22,6 +22,7 @@ import {
   useOthers,
   shallow,
 } from "@liveblocks/react";
+import { Loader2 } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import "@liveblocks/react-ui/styles.css";
 import {
@@ -50,6 +51,7 @@ import type { CanvasTemplate } from "@/components/editor/starter-templates";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useCanvasAutosave } from "@/hooks/use-canvas-autosave";
 import { PresenceAvatars } from "@/components/editor/presence-avatars";
+import { AiPresenceOverlay } from "@/components/editor/ai-presence-overlay";
 
 function CursorSvg({ color }: { color: string }) {
   return (
@@ -83,6 +85,7 @@ function CollaboratorCursors() {
           cursor: o.presence.cursor as { x: number; y: number },
           name: o.info?.displayName ?? "Collaborator",
           color: o.info?.cursorColor ?? "#6366f1",
+          thinking: o.presence.thinking === true,
         })),
     shallow,
   );
@@ -102,7 +105,7 @@ function CollaboratorCursors() {
         overflow: "hidden",
       }}
     >
-      {others.map(({ connectionId, cursor, name, color }) => {
+      {others.map(({ connectionId, cursor, name, color, thinking }) => {
         const x = cursor.x * zoom + panX;
         const y = cursor.y * zoom + panY;
         return (
@@ -132,13 +135,24 @@ function CollaboratorCursors() {
                 fontWeight: 500,
                 whiteSpace: "nowrap",
                 lineHeight: "18px",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
               }}
             >
-              {name}
+              {thinking && (
+                <Loader2
+                  width={10}
+                  height={10}
+                  style={{ animation: "lb-cursor-spin 0.9s linear infinite" }}
+                />
+              )}
+              <span>{name}</span>
             </div>
           </div>
         );
       })}
+      <style>{`@keyframes lb-cursor-spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -442,8 +456,13 @@ function BaseCanvasContent({ projectId }: BaseCanvasProps) {
         onMouseLeave={handleMouseLeave}
         connectionMode={ConnectionMode.Loose}
         fitView
+        // Cap maxZoom at 1 so the queued initial fitView never zooms past
+        // 100% — important when an empty canvas first receives a single
+        // AI-inserted node and the default cap (2x) would zoom way in.
+        fitViewOptions={{ padding: 0.2, maxZoom: 1 }}
         className="bg-base">
         <CollaboratorCursors />
+        <AiPresenceOverlay />
         <Panel position="top-right" className="mr-4 mt-4">
           <PresenceAvatars />
         </Panel>
