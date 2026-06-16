@@ -495,7 +495,7 @@ function AiArchitectTab({ projectId, roomId }: AiArchitectTabProps) {
       .slice(-HISTORY_LIMIT)
       .map((e) => e.data);
 
-    const chatWriteOk = await publishArchitectMessage(userMessage);
+    const chatWriteOk = await publishArchitectMessage(userMessage, optimisticId);
     if (!chatWriteOk) {
       setChatError(
         "Couldn't send your message — Phantom AI will still try to respond.",
@@ -844,8 +844,9 @@ function RoomChatTab() {
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "72px";
 
+    const feedOptions = { id: optimisticId, createdAt: now };
     try {
-      await createFeedMessage(AI_CHAT_FEED_ID, payload);
+      await createFeedMessage(AI_CHAT_FEED_ID, payload, feedOptions);
     } catch (firstErr) {
       console.warn(
         "ai-sidebar: createFeedMessage(ai-chat) failed in chat tab, retrying",
@@ -853,7 +854,7 @@ function RoomChatTab() {
       );
       try {
         await ensureChatFeed();
-        await createFeedMessage(AI_CHAT_FEED_ID, payload);
+        await createFeedMessage(AI_CHAT_FEED_ID, payload, feedOptions);
       } catch (retryErr) {
         console.warn(
           "ai-sidebar: createFeedMessage(ai-chat) retry failed in chat tab",

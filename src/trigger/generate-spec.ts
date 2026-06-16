@@ -10,7 +10,7 @@ import {
 } from "@/lib/ai/spec-schema";
 import type { AiChatMessage } from "@/types/tasks";
 
-const OPENAI_MODEL_ID = "gpt-4o-mini";
+const OPENAI_MODEL_ID = "gpt-5.4-pro";
 
 const SPEC_GENERATION_SYSTEM_PROMPT = `You are Phantom AI, a senior software architect and technical writer specialised in distributed systems.
 
@@ -64,7 +64,8 @@ function describeEdges(edges: SpecCanvasEdge[]): string {
 }
 
 function describeChatHistory(chatHistory: AiChatMessage[]): string {
-  if (chatHistory.length === 0) return "No conversation history provided.";
+  if (chatHistory.length === 0)
+    return "No conversation history provided.";
   return chatHistory
     .map((m) => `${m.sender} (${m.role}): ${m.content}`)
     .join("\n");
@@ -114,12 +115,16 @@ export const generateSpec = schemaTask({
       data: { projectId, filePath: "" },
     });
 
-    const blob = await put(`specs/${projectId}/${specRecord.id}.md`, text, {
-      access: "private",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      contentType: "text/markdown",
-    });
+    const blob = await put(
+      `specs/${projectId}/${specRecord.id}.md`,
+      text,
+      {
+        access: "private",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        contentType: "text/markdown",
+      },
+    );
 
     await prisma.projectSpec.update({
       where: { id: specRecord.id },

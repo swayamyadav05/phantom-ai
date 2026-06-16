@@ -20,14 +20,18 @@ import type { DesignAction } from "@/lib/ai/design-plan";
  * on shape/color validation, layout cursor behavior, and status broadcasts.
  */
 
-export const OPENAI_MODEL_ID = "gpt-4o-mini";
+export const OPENAI_MODEL_ID = "gpt-5.4-pro";
 
 export const VALID_SHAPES = new Set<CanvasNodeShape>(NODE_SHAPES);
 export const VALID_COLORS = new Set<CanvasNodeColor>(
   NODE_COLORS.map((c) => c.fill),
 );
 
-export type AiAgentStatus = "started" | "processing" | "completed" | "failed";
+export type AiAgentStatus =
+  | "started"
+  | "processing"
+  | "completed"
+  | "failed";
 
 export function broadcastStatus(
   client: Liveblocks,
@@ -146,7 +150,10 @@ export function buildEdgeFromAction(
   };
 }
 
-export function nodeCenter(node: CanvasNode): { x: number; y: number } {
+export function nodeCenter(node: CanvasNode): {
+  x: number;
+  y: number;
+} {
   const w = node.width ?? 160;
   const h = node.height ?? 80;
   return {
@@ -308,7 +315,13 @@ export async function applyDesignActions({
       const target = actionTargetCursor(action, trackedNodes);
       if (target) {
         try {
-          await broadcastPresence(client, roomId, runId, target, true);
+          await broadcastPresence(
+            client,
+            roomId,
+            runId,
+            target,
+            true,
+          );
           await new Promise((r) => setTimeout(r, CURSOR_LEAD_MS));
         } catch {
           // non-fatal — proceed with the mutation even if presence broadcast fails
@@ -327,7 +340,10 @@ export async function applyDesignActions({
                 rawNode.height ?? 80,
                 Array.from(trackedNodes.values()),
               );
-              const node: CanvasNode = { ...rawNode, position: resolvedPos };
+              const node: CanvasNode = {
+                ...rawNode,
+                position: resolvedPos,
+              };
               flow.addNode(node);
               trackedNodes.set(node.id, node);
               break;
@@ -376,7 +392,8 @@ export async function applyDesignActions({
             case "updateNodeData": {
               flow.updateNodeData(action.id, (data) => {
                 const next = { ...data };
-                if (action.label !== undefined) next.label = action.label;
+                if (action.label !== undefined)
+                  next.label = action.label;
                 if (
                   action.color !== undefined &&
                   VALID_COLORS.has(action.color as CanvasNodeColor)
