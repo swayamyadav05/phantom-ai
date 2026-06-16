@@ -1,7 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Component, type ReactNode, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import {
+  LiveblocksProvider,
+  RoomProvider,
+} from "@liveblocks/react/suspense";
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
@@ -23,6 +27,46 @@ interface EditorShellProps {
   children: React.ReactNode;
   ownedProjects: Project[];
   sharedProjects: Project[];
+}
+
+interface LiveblocksConnectionBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
+interface LiveblocksConnectionBoundaryState {
+  hasError: boolean;
+}
+
+class LiveblocksConnectionBoundary extends Component<
+  LiveblocksConnectionBoundaryProps,
+  LiveblocksConnectionBoundaryState
+> {
+  state: LiveblocksConnectionBoundaryState = { hasError: false };
+
+  static getDerivedStateFromError(): LiveblocksConnectionBoundaryState {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+function ConnectionErrorFallback() {
+  return (
+    <div className="flex h-[calc(100vh-3rem)] w-full items-center justify-center bg-base">
+      <div className="rounded-lg border border-surface-border bg-elevated px-5 py-4 text-center shadow-lg">
+        <p className="text-sm font-medium text-copy-primary">
+          Canvas connection failed
+        </p>
+        <p className="mt-1 text-xs text-copy-muted">
+          Refresh the workspace to reconnect to the shared room.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function findCurrentProject(
@@ -51,7 +95,9 @@ function EditorShellInner({
   sharedProjects,
 }: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(false);
+  // Open the AI Workspace by default so it's visible as soon as a workspace
+  // loads (incl. a freshly created project) without an extra click.
+  const [isAiSidebarOpen, setIsAiSidebarOpen] = useState(true);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const { setOpen: setStarterTemplatesOpen } = useStarterTemplates();
   const { status: saveStatus, manualSave } = useCanvasSave();
@@ -87,7 +133,7 @@ function EditorShellInner({
       }
     : undefined;
 
-  return (
+  const shellChrome = (
     <ProjectActionsContext.Provider
       value={{
         openCreate: actions.openCreate,
@@ -117,6 +163,8 @@ function EditorShellInner({
           <AiSidebar
             isOpen={isAiSidebarOpen}
             onClose={() => setIsAiSidebarOpen(false)}
+            projectId={currentProject.id}
+            roomId={currentProject.id}
           />
           <ShareDialog
             open={isShareOpen}
@@ -127,5 +175,23 @@ function EditorShellInner({
         </>
       )}
     </ProjectActionsContext.Provider>
+  );
+
+  if (!currentProject) return shellChrome;
+
+  return (
+    <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
+      <LiveblocksConnectionBoundary
+        key={currentProject.id}
+        fallback={<ConnectionErrorFallback />}
+      >
+        <RoomProvider
+          id={currentProject.id}
+          initialPresence={{ cursor: null, thinking: false }}
+        >
+          {shellChrome}
+        </RoomProvider>
+      </LiveblocksConnectionBoundary>
+    </LiveblocksProvider>
   );
 }

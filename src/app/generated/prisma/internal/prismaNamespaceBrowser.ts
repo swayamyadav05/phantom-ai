@@ -51,8 +51,10 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  ProjectSpec: 'ProjectSpec',
   Project: 'Project',
-  ProjectCollaborator: 'ProjectCollaborator'
+  ProjectCollaborator: 'ProjectCollaborator',
+  TaskRun: 'TaskRun'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -69,6 +71,16 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const ProjectSpecScalarFieldEnum = {
+  id: 'id',
+  projectId: 'projectId',
+  filePath: 'filePath',
+  createdAt: 'createdAt'
+} as const
+
+export type ProjectSpecScalarFieldEnum = (typeof ProjectSpecScalarFieldEnum)[keyof typeof ProjectSpecScalarFieldEnum]
 
 
 export const ProjectScalarFieldEnum = {
@@ -94,6 +106,17 @@ export const ProjectCollaboratorScalarFieldEnum = {
 } as const
 
 export type ProjectCollaboratorScalarFieldEnum = (typeof ProjectCollaboratorScalarFieldEnum)[keyof typeof ProjectCollaboratorScalarFieldEnum]
+
+
+export const TaskRunScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  projectId: 'projectId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TaskRunScalarFieldEnum = (typeof TaskRunScalarFieldEnum)[keyof typeof TaskRunScalarFieldEnum]
 
 
 export const SortOrder = {
